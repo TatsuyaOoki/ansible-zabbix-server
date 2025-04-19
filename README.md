@@ -9,6 +9,7 @@
 |  install_zabbix_server  |  Zabbix Serverのインストールを行う  |  |
 |  set_locale  |  Localeの設定を行う  |  Zabbixの日本語化に必要  |
 
+
 ## コンテナを使用したPlaybookの実行方法
 
 0. 事前準備
