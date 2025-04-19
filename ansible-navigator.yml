@@ -8,7 +8,7 @@ ansible-navigator:
       policy: never
     volume-mounts:
       - src: ./.ssh/ansible.pem
-        dest: ./ssh/ansible.pem
+        dest: /tmp/ansible.pem
         options: ro
   mode: stdout
   logging:
