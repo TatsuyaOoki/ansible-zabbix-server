@@ -1,0 +1,6 @@
+---
+os:
+  swap_file_path: "/swapfile"
+mysql:
+  zabbix_user_password: "zabbix_user_password"
+  root_user_password: "root_user_password"

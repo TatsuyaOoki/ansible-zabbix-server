@@ -1,0 +1,45 @@
+---
+- name: Create swap file
+  ansible.builtin.command: dd if=/dev/zero of={{ os.swap_file_path }} bs=1M count={{ ansible_memtotal_mb * 2 }}
+  args:
+    creates: "{{ os.swap_file_path }}"
+  changed_when: true
+
+- name: Create a swap area on the swap file
+  ansible.builtin.command: mkswap {{ os.swap_file_path }}
+  changed_when: true
+
+- name: Set swapfile permissions.
+  ansible.builtin.file:
+    path: "{{ os.swap_file_path }}"
+    mode: "0600"
+
+- name: Register swap files in fstab.
+  ansible.posix.mount:
+    src: '{{ os.swap_file_path }}'
+    path: "none"
+    fstype: swap
+    opts: defaults
+    passno: "0"
+    dump: "0"
+    backup: true
+    state: present
+
+- name: Just force systemd to reread configs
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
+- name: Activate swap file.
+  ansible.builtin.command:
+    cmd: swapon "{{ os.swap_file_path }}"
+  changed_when: true
+
+- name: Confirmation of creation of swap area
+  ansible.builtin.command:
+    cmd: free -h
+  changed_when: false
+  register: post_check_swap_area
+
+- name: Display of swap space.
+  ansible.builtin.debug:
+    var: post_check_swap_area.stdout_lines

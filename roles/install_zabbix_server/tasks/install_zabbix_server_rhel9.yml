@@ -1,0 +1,154 @@
+---
+- name: Check if the EPEL.repo provided by EPEL exists
+  ansible.builtin.stat:
+    path: /etc/yum.repos.d/epel.repo
+  register: epel_repo_result
+
+- name: Disable EPEL Zabbix packages if epel.repo exists
+  community.general.ini_file:
+    path: /etc/yum.repos.d/epel.repo
+    state: present
+    section: epel
+    option: excludepkgs
+    value: zabbix*
+    mode: "0644"
+    exclusive: false
+    backup: true
+  when: epel_repo_result.stat.exists
+
+- name: Copy Zabbix Agent package
+  ansible.builtin.copy:
+    src: "packages/{{ install_zabbix_server_rpm_rhel9 }}"
+    dest: "/tmp/"
+    mode: "0644"
+
+- name: Copy Zabbix Agent GPG Keys
+  ansible.builtin.copy:
+    src: "gpg_keys/{{ item }}"
+    dest: "/tmp/"
+    mode: "0644"
+  loop: "{{ install_zabbix_server_gpg_keys_rhel9 }}"
+
+- name: Import Zabbix Agent GPG keys
+  ansible.builtin.rpm_key:
+    key: "/tmp/{{ item }}"
+    state: present
+  loop: "{{ install_zabbix_server_gpg_keys_rhel9 }}"
+
+- name: Install Zabbix Agent Repository
+  ansible.builtin.dnf:
+    name: "/tmp/{{ install_zabbix_server_rpm_rhel9 }}"
+    state: present
+    update_cache: true
+
+- name: Install Zabbix Server
+  ansible.builtin.dnf:
+    name: "{{ install_zabbix_server_dnf_rhel9 }}"
+    state: present
+    update_cache: true
+
+- name: Start and enable MySQL
+  ansible.builtin.service:
+    name: mysqld
+    state: started
+    enabled: true
+
+- name: Ensure python3-pip is installed
+  ansible.builtin.dnf:
+    name: python3-pip
+    state: present
+
+- name: Ensure PyMySQL is installed
+  ansible.builtin.pip:
+    name: PyMySQL
+    executable: pip3
+
+- name: Check if root password is set correctly
+  ansible.builtin.shell: |
+    mysql -u root --password={{ mysql.root_user_password }} -e "SELECT 1;"
+  changed_when: false
+  ignore_errors: true
+  register: mysql_auth_check
+
+- name: Set root password if current one is blank or wrong
+  community.mysql.mysql_user:
+    name: root
+    host: localhost
+    password: "{{ mysql.root_user_password }}"
+    login_user: root
+    login_password: ""
+  when: mysql_auth_check.rc != 0
+
+- name: Create a new database with name 'zabbix'
+  community.mysql.mysql_db:
+    name: zabbix
+    state: present
+    encoding: utf8mb4
+    collation: utf8mb4_bin
+    login_host: localhost
+    login_user: root
+    login_password: "{{ mysql.root_user_password }}"
+
+- name: Create zabbix user
+  community.mysql.mysql_user:
+    name: zabbix
+    host: localhost
+    password: "{{ mysql.zabbix_user_password }}"
+    priv: "zabbix.*:ALL"
+    state: present
+    column_case_sensitive: true
+    login_user: root
+    login_password: "{{ mysql.root_user_password }}"
+
+- name: Enable log_bin_trust_function_creators
+  community.mysql.mysql_variables:
+    variable: log_bin_trust_function_creators
+    value: 1
+    login_user: root
+    login_password: "{{ mysql.root_user_password }}"
+
+- name: Check if Zabbix schema is already imported
+  ansible.builtin.shell: |
+    set -ueo pipefail
+    mysql -uzabbix -p'{{ mysql.zabbix_user_password }}' -e "USE zabbix; SHOW TABLES LIKE 'users';" | grep users
+  register: zabbix_schema_check
+  changed_when: false
+  ignore_errors: true
+
+- name: Import initial Zabbix schema
+  ansible.builtin.shell: |
+    set -ueo pipefail
+    zcat /usr/share/zabbix/sql-scripts/mysql/server.sql.gz | \
+    mysql --default-character-set=utf8mb4 -uzabbix -p{{ mysql.zabbix_user_password }} zabbix
+  args:
+    executable: /bin/bash
+  changed_when: true
+  when: zabbix_schema_check.rc != 0
+
+- name: Disalbe log_bin_trust_function_creators
+  community.mysql.mysql_variables:
+    variable: log_bin_trust_function_creators
+    value: 0
+    login_user: root
+    login_password: "{{ mysql.root_user_password }}"
+
+- name: Configure the database for Zabbix server
+  ansible.builtin.lineinfile:
+    path: /etc/zabbix/zabbix_server.conf
+    insertafter: "^# DBPassword=$"
+    line: "DBPassword={{ mysql.zabbix_user_password }}"
+    backup: true
+    mode: "0644"
+    owner: zabbix
+    group: zabbix
+
+- name: Start and enable Zabbix server, Agent, Apache, php-fpm
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - zabbix-server
+    - zabbix-agent
+    - httpd
+    - php-fpm

@@ -1,0 +1,56 @@
+---
+- name: Install Japanese Language Pack
+  ansible.builtin.dnf:
+    name:
+      - glibc-langpack-ja
+    state: present
+
+- name: Check System Locale (before change)
+  ansible.builtin.shell: |
+    set -ueo pipefail
+    localectl status | grep "System Locale"
+  changed_when: false
+  register: result_locale_pre
+
+- name: Locale Settings
+  ansible.builtin.command: localectl set-locale LANG={{ set_locale_system_locale }}
+  changed_when: true
+  when: set_locale_system_locale not in result_locale_pre.stdout
+
+- name: Check System Locale (after change)
+  ansible.builtin.shell: |
+    set -ueo pipefail
+    localectl status | grep "System Locale"
+  changed_when: false
+  register: result_locale_post
+
+- name: Confirmation of Locale
+  ansible.builtin.assert:
+    that:
+      - set_locale_system_locale in result_locale_post.stdout
+    fail_msg: "Locale is not as expected"
+
+- name: Check Keymap (before change)
+  ansible.builtin.shell: |
+    set -ueo pipefail
+    localectl status | grep "VC Keymap"
+  changed_when: false
+  register: result_keymap_pre
+
+- name: Keymap Settings
+  ansible.builtin.command: localectl set-keymap {{ set_locale_keymap }}
+  changed_when: true
+  when: set_locale_keymap not in result_keymap_pre.stdout
+
+- name: Check Keymap (after change)
+  ansible.builtin.shell: |
+    set -ueo pipefail
+    localectl status | grep "VC Keymap"
+  changed_when: false
+  register: result_keymap_post
+
+- name: Confirmation of keymap
+  ansible.builtin.assert:
+    that:
+      - set_locale_keymap in result_keymap_post.stdout
+    fail_msg: "Keymap is not as expected"

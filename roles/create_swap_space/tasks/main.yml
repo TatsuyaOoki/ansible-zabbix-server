@@ -1,0 +1,6 @@
+---
+- name: Include action tasks
+  ansible.builtin.include_tasks: create_swap_space.yml
+  when:
+    - ansible_swaptotal_mb == 0
+    - ansible_memtotal_mb <= 1024

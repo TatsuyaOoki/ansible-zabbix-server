@@ -1,0 +1,14 @@
+---
+install_zabbix_server_rpm_rhel9: "zabbix-release-latest-7.2.el9.noarch.rpm"
+install_zabbix_server_dnf_rhel9:
+  - mysql-server
+  - httpd
+  - zabbix-server-mysql
+  - zabbix-web-mysql
+  - zabbix-apache-conf
+  - zabbix-sql-scripts
+  - zabbix-selinux-policy
+  - zabbix-agent
+install_zabbix_server_gpg_keys_rhel9:
+  - RPM-GPG-KEY-ZABBIX-B5333005
+  - RPM-GPG-KEY-ZABBIX-TOOLS

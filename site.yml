@@ -1,0 +1,8 @@
+---
+- name: Setup Zabbix server
+  hosts: zabbix_servers
+  become: true
+  roles:
+    - set_locale
+    - create_swap_space
+    - install_zabbix_server
