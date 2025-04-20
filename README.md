@@ -31,7 +31,7 @@
     - 暗号化を行う変数の対応
       `inventories/group_vars/all.yml`のzabbix_user_passwordとroot_user_passwordにvaultで暗号化した値を入力する\
       ※以下のコマンドを実行して、暗号化を行う\
-      `ansible-vault encrypt_string password --name 'zabbix_user_password'`\
+      `ansible-vault encrypt_string password --name 'zabbix_user_password'`
       
       また、`.vault_pass.sample`を`.vault_pass`としてコピーし、vaultパスワードを記載する。
 
