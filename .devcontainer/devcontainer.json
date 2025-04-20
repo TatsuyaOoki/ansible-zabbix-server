@@ -23,6 +23,9 @@
 				"DavidAnson.vscode-markdownlint"
 			],
 			"settings": {
+				"yaml.customTags": [
+					"!vault"
+				],
 				"ansible.ansible.path": "/home/vscode/.local/bin/ansible",
 				"ansible.validation.enabled": true,
 				"ansible.validation.lint.enabled": true,
