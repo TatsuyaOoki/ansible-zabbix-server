@@ -9,6 +9,34 @@
 |  install_zabbix_server  |  Zabbix Serverのインストールを行う  |  |
 |  set_locale  |  Localeの設定を行う  |  Zabbixの日本語化に必要  |
 
-実行環境に必要なパッケージ
-    - PyMySQL
-    - MySQLの実行
+
+## コンテナを使用したPlaybookの実行方法
+
+0. 事前準備
+
+    - DockerまたはPodmanを導入し、以下のPythonパッケージをインストールする
+
+        - ansible-navigator
+        - ansible-builder
+
+    - Managed Nodeへの接続ユーザー用秘密鍵の配置
+        
+      マネージドノード接続用のユーザーの秘密鍵を`.ssh`ディレクトリに`ansible.pem`という名前で保存\
+      秘密鍵のパーミッションは`600`とする
+    
+    - インベントリファイルの修正
+      
+      `inventories/inventory.yml`を開き、`ansible_host`にマネージドノードのIPを記載する
+
+1. コンテナイメージの作成
+
+    以下のコマンドを実行し、コンテナイメージを作成する\
+    `cd ./execution_environment`\
+    `ansible-builder build --tag=costom-ee --file ./execution-environment.yml`
+
+2. Playbook実行
+
+   `ansible-navigator run <Playbookファイル> -i <inventory fileのパス> --ee true --eei custom-ee --pull-policy never -m stdout`
+
+   ※`ansible-navigator.yml`でAnsible Navigatorの設定をしているため、以下のように省略可能\
+   `ansible-navigator run <playbookファイル> -i inventories/inventory.yml`

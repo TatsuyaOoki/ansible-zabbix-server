@@ -1,0 +1,6 @@
+zip
+unzip
+openssh-clients
+python3.12
+python3.12-pip
+mysql

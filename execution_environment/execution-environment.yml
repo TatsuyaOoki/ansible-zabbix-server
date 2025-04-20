@@ -1,0 +1,29 @@
+---
+version: 3
+
+images:
+  base_image:
+    name: 'docker.io/redhat/ubi9:9.5-1744101466'
+
+dependencies:
+  python_interpreter:
+    package_system: "python3.12"
+    python_path: "/usr/bin/python3.12"
+  ansible_core:
+    package_pip: ansible-core==2.18.4
+  ansible_runner:
+    package_pip: ansible-runner==2.4.1
+  galaxy: requirements.yml
+  python: requirements.txt
+  system: bindep.txt
+
+# options:
+#   package_manager_path: /usr/bin/microdnf
+
+additional_build_files:
+  - src: files/ansible.cfg
+    dest: configs
+
+additional_build_steps:
+  prepend_galaxy:
+    - COPY _build/configs/ansible.cfg /etc/ansible/ansible.cfg
