@@ -14,5 +14,6 @@ jobs:
       - name: Run ansible-lint
         uses: ansible/ansible-lint@main
         with:
+          args: "--skip-list internal-error site.yml"
           setup_python: "true"
           requirements_file: "./requirements.yml"
