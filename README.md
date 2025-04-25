@@ -9,7 +9,6 @@
 |  install_zabbix_server  |  Zabbix Serverのインストールを行う  |  |
 |  set_locale  |  Localeの設定を行う  |  Zabbixの日本語化に必要  |
 
-
 ## コンテナを使用したPlaybookの実行方法
 
 0. 事前準備
@@ -20,21 +19,20 @@
         - ansible-builder
 
     - Managed Nodeへの接続ユーザー用秘密鍵の配置
-        
+
       マネージドノード接続用のユーザーの秘密鍵を`.ssh`ディレクトリに`ansible.pem`という名前で保存\
       秘密鍵のパーミッションは`600`とする
-    
+
     - インベントリファイルの修正
-      
+
       `inventories/inventory.yml`を開き、`ansible_host`にマネージドノードのIPを記載する\
-    
+
     - 暗号化を行う変数の対応
       `inventories/group_vars/all.yml`のzabbix_user_passwordとroot_user_passwordにvaultで暗号化した値を入力する\
       ※以下のコマンドを実行して、暗号化を行う\
       `ansible-vault encrypt_string password --name 'zabbix_user_password'`
-      
-      また、`.vault_pass.sample`を`.vault_pass`としてコピーし、vaultパスワードを記載する。
 
+      また、`.vault_pass.sample`を`.vault_pass`としてコピーし、vaultパスワードを記載する。
 
 1. コンテナイメージの作成
 
