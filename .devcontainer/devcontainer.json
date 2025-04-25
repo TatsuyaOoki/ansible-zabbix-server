@@ -20,7 +20,8 @@
 			"extensions": [
 				"redhat.ansible",
 				"yzhang.markdown-all-in-one",
-				"DavidAnson.vscode-markdownlint"
+				"DavidAnson.vscode-markdownlint",
+				"GitHub.vscode-github-actions"
 			],
 			"settings": {
 				"yaml.customTags": [
