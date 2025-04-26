@@ -17,9 +17,9 @@ galaxy_info:
 
   min_ansible_version: "2.18"
   platforms:
-  - name: EL
-    versions:
-    - "9"
+    - name: EL
+      versions:
+        - "9"
 
   # If this a Container Enabled role, provide the minimum Ansible Container version.
   # min_ansible_container_version:
