@@ -1,0 +1,12 @@
+---
+argument_specs:
+  # roles/set_locale/tasks/main.yml entry point
+  main:
+    options:
+      set_locale_keymap:
+        type: "str"
+        required: true
+
+      set_locale_system_locale:
+        type: "str"
+        required: true
