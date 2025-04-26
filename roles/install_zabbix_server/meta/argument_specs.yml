@@ -1,0 +1,18 @@
+---
+argument_specs:
+  # roles/install_zabbix_server/tasks/main.yml entry point
+  main:
+    options:
+      install_zabbix_server_rpm_rhel9:
+        type: "str"
+        required: true
+
+      install_zabbix_server_dnf_rhel9:
+        type: "list"
+        elements: "str"
+        required: true
+
+      install_zabbix_server_gpg_keys_rhel9:
+        type: "list"
+        elements: "str"
+        required: true
