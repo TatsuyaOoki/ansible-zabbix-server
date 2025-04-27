@@ -1,5 +1,5 @@
 ---
 - name: Include action tasks for RHEL9
   ansible.builtin.include_tasks: install_zabbix_server_rhel9.yml
-  when: ansible_distribution == "RedHat" and
-        ansible_distribution_major_version == "9"
+  when: (ansible_distribution in ["RedHat", "Rocky", "AlmaLinux"]) and
+        (ansible_distribution_major_version == "9")

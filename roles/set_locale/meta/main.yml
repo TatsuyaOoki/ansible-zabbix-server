@@ -1,4 +1,6 @@
 galaxy_info:
+  namespace: tatsuya_ooki
+  role_name: set_locale
   author: Tatsuya Ooki
   description: This role is responsible for setting the LOCALE.
 
@@ -13,7 +15,7 @@ galaxy_info:
   # - GPL-3.0-only
   # - Apache-2.0
   # - CC-BY-4.0
-  license: Apache-2.0
+  license: MIT
 
   min_ansible_version: "2.18"
   platforms:

@@ -1,4 +1,6 @@
 galaxy_info:
+  namespace: tatsuya_ooki
+  role_name: create_swap_space
   author: Tatsuya Ooki
   description: This role creates a SWAP area.
 

@@ -1,0 +1,13 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+  tasks:
+    # - name: Ensure systemd (localectl) is installed
+    #   ansible.builtin.package:
+    #     name: systemd
+    #     state: present
+
+    - name: Include role
+      ansible.builtin.include_role:
+        name: tatsuya_ooki.install_zabbix_server

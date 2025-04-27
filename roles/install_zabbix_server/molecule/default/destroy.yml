@@ -1,0 +1,43 @@
+---
+- name: Destroy
+  hosts: molecule
+  gather_facts: false
+  # no_log: "{{ molecule_no_log }}"
+  tasks:
+    # Developer must implement.
+    - name: Stop and Remove container
+      community.docker.docker_container:
+        name: "{{ inventory_hostname }}"
+        state: absent
+      delegate_to: localhost
+
+    - name: Check if container exists
+      ansible.builtin.command:
+        cmd: docker container inspect instance
+      register: container_check
+      changed_when: false
+      ignore_errors: true
+      delegate_to: localhost
+
+    - name: Remove Potentially stopped container
+      ansible.builtin.command:
+        cmd: docker container rm {{ inventory_hostname }}
+      changed_when: false
+      when: container_check.rc == 0
+      delegate_to: localhost
+
+    # Mandatory configuration for Molecule to function.
+
+    - name: Populate instance config
+      ansible.builtin.set_fact:
+        instance_conf: {}
+
+    - name: Dump instance config
+      ansible.builtin.copy:
+        content: |
+          # Molecule managed
+
+          {{ instance_conf | to_json | from_json | to_yaml }}
+        dest: "{{ molecule_instance_config }}"
+        mode: "0600"
+      when: server.changed | default(false) | bool  # noqa no-handler
