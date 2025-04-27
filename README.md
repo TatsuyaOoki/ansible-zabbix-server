@@ -46,3 +46,8 @@
 
    ※`ansible-navigator.yml`でAnsible Navigatorの設定をしているため、以下のように省略可能\
    `ansible-navigator run <playbookファイル> -i inventories/inventory.yml`
+
+## Moleculeを使用したテスト
+
+各ロールに`molecule`ディレクトリを配置し、以下のコマンドでテストを実施する\
+`molecule test`
